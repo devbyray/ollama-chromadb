@@ -85,7 +85,9 @@ export class CollectionManager {
 
 		const results = await collection.query({
 			queryTexts: [query],
-			nResults: 2
+			nResults: 1,
+			minScore: 0.7,
+			include: ['documents', 'metadatas']
 		})
 
 		return results.documents[0]
@@ -115,5 +117,20 @@ export class CollectionManager {
 		})
 
 		return documents.length
+	}
+
+	async getAllDocuments() {
+		try {
+			const collection = await this.client.getCollection({
+				name: 'dev-by-rayray',
+				embeddingFunction: this.embedder
+			})
+
+			const result = await collection.get()
+			return result.documents || []
+		} catch (error) {
+			console.error('Error getting all documents:', error)
+			throw error
+		}
 	}
 }

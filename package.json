@@ -33,6 +33,7 @@
 		"chromadb": "^1.10.4",
 		"chromadb-default-embed": "^2.13.2",
 		"fastify": "^5.2.1",
-		"vue": "^3.5.13"
+		"vue": "^3.5.13",
+		"vue-router": "^4.5.0"
 	}
 }
