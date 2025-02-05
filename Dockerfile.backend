@@ -1,9 +1,0 @@
-FROM node:18-alpine
-
-WORKDIR /usr/src/app
-
-# Don't copy anything initially
-RUN npm install -g pnpm
-
-# Start command that installs dependencies first
-CMD ["sh", "-c", "pnpm install && node server.js"]

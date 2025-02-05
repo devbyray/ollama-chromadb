@@ -1,46 +1,14 @@
 {
 	"name": "chromadb-client",
 	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"files": [
-		"dist",
-		"index.d.ts"
-	],
-	"main": "./dist/counter.umd.cjs",
-	"module": "./dist/counter.js",
-	"types": "./index.d.ts",
-	"exports": {
-		"types": "./index.d.ts",
-		"import": "./dist/counter.js",
-		"require": "./dist/counter.umd.cjs"
-	},
 	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"preview": "vite preview",
-		"backend": "node ./server.js --watch",
-		"docker:dev": "pnpm build && docker compose -f dev-compose.yml up --build"
+		"dev": "pnpm -r dev",
+		"build": "pnpm -r build",
+		"frontend:dev": "pnpm -F @chromadb-client/frontend dev",
+		"backend:dev": "pnpm -F @chromadb-client/backend dev",
+		"docker:dev": "pnpm build && docker compose up --build -d"
 	},
-	"devDependencies": {
-		"@tailwindcss/postcss": "^4.0.3",
-		"@tailwindcss/vite": "^4.0.3",
-		"autoprefixer": "^10.4.16",
-		"postcss": "^8.5.1"
-	},
-	"dependencies": {
-		"dotenv": "^16.4.1",
-		"ollama": "^0.5.0",
-		"chromadb": "^1.10.4",
-		"chromadb-default-embed": "^2.13.2",
-		"fastify": "^5.2.1",
-		"gray-matter": "^4.0.3",
-		"remark": "^15.0.1",
-		"strip-markdown": "^6.0.0",
-		"vue": "^3.5.13",
-		"vue-router": "^4.5.0",
-		"vite": "^5.0.0",
-		"@vitejs/plugin-vue": "^5.0.0",
-		"tailwindcss": "^4.0.0"
-	}
+	"workspaces": [
+		"apps/*"
+	]
 }
