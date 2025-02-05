@@ -1,4 +1,6 @@
 import { ChromaClient } from 'chromadb'
+import { DocumentProcessorFactory } from './documentProcessors.js'
+import { config } from './config.js'
 
 export const sampleDocs = [
 	'JavaScript is a high-level programming language primarily used for web development.',
@@ -26,21 +28,51 @@ export function validateArrays(ids, embeddings, documents, metadatas) {
 	return true
 }
 
+const CHUNK_SIZE = 500 // characters per chunk
+const CHUNK_OVERLAP = 50 // overlap between chunks
+
+function splitIntoChunks(text) {
+	const chunks = []
+	let startIndex = 0
+
+	while (startIndex < text.length) {
+		let endIndex = startIndex + CHUNK_SIZE
+
+		// If we're not at the end of the text, try to find a natural break point
+		if (endIndex < text.length) {
+			const nextPeriod = text.indexOf('.', endIndex - CHUNK_OVERLAP)
+			const nextNewline = text.indexOf('\n', endIndex - CHUNK_OVERLAP)
+
+			if (nextPeriod !== -1 && nextPeriod < endIndex + CHUNK_OVERLAP) {
+				endIndex = nextPeriod + 1
+			} else if (nextNewline !== -1 && nextNewline < endIndex + CHUNK_OVERLAP) {
+				endIndex = nextNewline + 1
+			}
+		}
+
+		chunks.push(text.slice(startIndex, endIndex).trim())
+		startIndex = endIndex - CHUNK_OVERLAP
+	}
+
+	return chunks
+}
+
 export class CollectionManager {
 	constructor(embeddingFunction) {
-		this.client = new ChromaClient()
+		this.client = new ChromaClient({ path: config.chroma.serverUrl })
 		this.embedder = embeddingFunction
+		this.collectionName = config.chroma.collectionName
 	}
 
 	async initializeCollection() {
 		try {
 			const collections = await this.client.listCollections()
-			const exists = collections.find(c => c.name === 'dev-by-rayray')
+			const exists = collections.find(c => c.name === this.collectionName)
 
 			if (!exists) {
 				console.log('Creating new collection...')
 				const collection = await this.client.getOrCreateCollection({
-					name: 'dev-by-rayray',
+					name: this.collectionName,
 					embeddingFunction: this.embedder
 				})
 
@@ -68,7 +100,7 @@ export class CollectionManager {
 
 			console.log('Collection already exists')
 			return await this.client.getCollection({
-				name: 'dev-by-rayray',
+				name: this.collectionName,
 				embeddingFunction: this.embedder
 			})
 		} catch (err) {
@@ -79,41 +111,60 @@ export class CollectionManager {
 
 	async retrieveRelevantDocs(query) {
 		const collection = await this.client.getCollection({
-			name: 'dev-by-rayray',
+			name: this.collectionName,
 			embeddingFunction: this.embedder
 		})
 
 		const results = await collection.query({
 			queryTexts: [query],
-			nResults: 1,
-			minScore: 0.7,
+			nResults: 3,
+			minScore: 0.9,
 			include: ['documents', 'metadatas']
 		})
+
+		console.log('Query results:', results?.metadatas)
 
 		return results.documents[0]
 	}
 
-	async addDocuments(documents) {
+	async addDocuments(documents, type = 'plain') {
 		const collection = await this.client.getCollection({
-			name: 'dev-by-rayray',
+			name: this.collectionName,
 			embeddingFunction: this.embedder
 		})
 
-		const ids = documents.map((_, i) => `doc${Date.now()}_${i}`)
-		const metadatas = documents.map(() => ({
-			source: 'api-input',
-			timestamp: new Date().toISOString()
-		}))
+		const processor = DocumentProcessorFactory.getProcessor(type)
+		let allChunks = []
+		let allIds = []
+		let allMetadatas = []
 
-		const embeddings = await this.embedder.generate(documents)
+		// Process each document
+		for (let docIndex = 0; docIndex < documents.length; docIndex++) {
+			const { content, metadata } = await processor.process(documents[docIndex])
+			const chunks = splitIntoChunks(content)
+			allChunks.push(...chunks)
 
-		validateArrays(ids, embeddings, documents, metadatas)
+			// Create IDs and metadata for each chunk
+			chunks.forEach((_, chunkIndex) => {
+				const id = `doc${Date.now()}_${docIndex}_chunk${chunkIndex}`
+				allIds.push(id)
+				allMetadatas.push({
+					...metadata,
+					documentIndex: docIndex,
+					chunkIndex: chunkIndex,
+					totalChunks: chunks.length
+				})
+			})
+		}
+
+		const embeddings = await this.embedder.generate(allChunks)
+		validateArrays(allIds, embeddings, allChunks, allMetadatas)
 
 		await collection.add({
-			ids,
+			ids: allIds,
 			embeddings,
-			documents,
-			metadatas
+			documents: allChunks,
+			metadatas: allMetadatas
 		})
 
 		return documents.length
@@ -122,7 +173,7 @@ export class CollectionManager {
 	async getAllDocuments() {
 		try {
 			const collection = await this.client.getCollection({
-				name: 'dev-by-rayray',
+				name: this.collectionName,
 				embeddingFunction: this.embedder
 			})
 
@@ -130,6 +181,22 @@ export class CollectionManager {
 			return result.documents || []
 		} catch (error) {
 			console.error('Error getting all documents:', error)
+			throw error
+		}
+	}
+
+	async clearCollection() {
+		try {
+			// Delete the entire collection using the client's deleteCollection method
+			await this.client.deleteCollection({
+				name: this.collectionName
+			})
+
+			// Reinitialize an empty collection
+			await this.initializeCollection()
+			return true
+		} catch (error) {
+			console.error('Error clearing collection:', error)
 			throw error
 		}
 	}

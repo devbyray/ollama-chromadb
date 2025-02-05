@@ -1,9 +1,15 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import { Ollama } from 'ollama'
+import { config } from './config.js'
 
 const execAsync = promisify(exec)
 
 export class OllamaEmbeddingFunction {
+	constructor() {
+		this.ollama = new Ollama({ baseUrl: config.ollama.baseUrl })
+	}
+
 	async checkModelAvailability(modelName) {
 		try {
 			// Check CLI
@@ -58,53 +64,31 @@ export class OllamaEmbeddingFunction {
 	}
 
 	async generate(texts) {
-		const modelCandidates = ['nomic-embed-text:latest', 'llama3.2:latest']
-		let selectedModel = null
-		let availableModels = []
-
-		for (const modelName of modelCandidates) {
-			const { modelInApi, availableModels: models } = await this.checkModelAvailability(modelName)
-			availableModels = models
-			if (modelInApi) {
-				selectedModel = modelName
-				break
-			}
-		}
-
-		if (!selectedModel) {
-			throw new Error(`No suitable embedding model found. Available models: ${availableModels.join(', ')}`)
-		}
-
-		console.log(`Using model: ${selectedModel}`)
-
+		const modelName = config.ollama.embeddingModel
 		try {
+			const { modelInApi } = await this.checkModelAvailability(modelName)
+
+			if (!modelInApi) {
+				console.log(`Installing ${modelName} model...`)
+				await this.ollama.pull({ model: modelName })
+			}
+
+			console.log(`Using model: ${modelName}`)
+
 			const embeddings = await Promise.all(
 				texts.map(async text => {
 					try {
 						const sanitizedText = this.sanitizeText(text)
-						const response = await fetch('http://localhost:11434/api/embeddings', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({
-								model: selectedModel,
-								prompt: sanitizedText,
-								options: {
-									temperature: 0
-								}
-							})
+						const response = await this.ollama.embeddings({
+							model: modelName,
+							prompt: sanitizedText
 						})
 
-						if (!response.ok) {
-							const errorData = await response.text()
-							throw new Error(`Embedding request failed (${response.status}): ${errorData}`)
+						if (!Array.isArray(response)) {
+							console.error('Invalid embedding response:', response)
+							throw new Error('Invalid embedding response format from Ollama')
 						}
-
-						const data = await response.json()
-						if (!data.embedding || !Array.isArray(data.embedding)) {
-							console.error('Invalid embedding response:', data)
-							throw new Error('Invalid embedding response from Ollama')
-						}
-						return data.embedding
+						return response
 					} catch (error) {
 						console.error('Error generating individual embedding:', error)
 						throw error

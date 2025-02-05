@@ -11,8 +11,8 @@
 					required
 				></textarea>
 			</div>
-			<button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-				{{ isSubmitting ? 'Adding...' : 'Add Document' }}
+			<button type="submit" class="btn btn-primary" :disabled="isLoading">
+				{{ isLoading ? 'Adding...' : 'Add Document' }}
 			</button>
 			<div v-if="message" :class="['alert', message.type === 'error' ? 'alert-danger' : 'alert-success']">
 				{{ message.text }}
@@ -21,44 +21,23 @@
 	</div>
 </template>
 
-<script>
-export default {
-	name: 'AddDocument',
-	data() {
-		return {
-			content: '',
-			isSubmitting: false,
-			message: null
-		}
-	},
-	methods: {
-		async submitDocument() {
-			this.isSubmitting = true
-			this.message = null
+<script setup>
+import { ref } from 'vue'
+import { useDocuments } from '../composables/useDocuments'
 
-			try {
-				const response = await fetch('/api/document', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ content: this.content })
-				})
+const { addDocument, error: apiError, isLoading } = useDocuments()
+const content = ref('')
+const message = ref(null)
 
-				const data = await response.json()
+async function submitDocument() {
+	if (!content.value) return
 
-				if (data.success) {
-					this.message = { type: 'success', text: 'Document added successfully!' }
-					this.content = ''
-				} else {
-					this.message = { type: 'error', text: data.error || 'Failed to add document' }
-				}
-			} catch (error) {
-				this.message = { type: 'error', text: 'Error connecting to server' }
-			} finally {
-				this.isSubmitting = false
-			}
-		}
+	try {
+		await addDocument(content.value)
+		message.value = { type: 'success', text: 'Document added successfully!' }
+		content.value = ''
+	} catch (error) {
+		message.value = { type: 'error', text: apiError.value || 'Error adding document' }
 	}
 }
 </script>

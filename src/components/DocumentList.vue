@@ -23,24 +23,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useDocuments } from '../composables/useDocuments'
 
-const documents = ref([])
-const error = ref('')
-
-async function fetchDocuments() {
-	try {
-		const response = await fetch('/api/documents')
-		const data = await response.json()
-		if (data.success) {
-			documents.value = data.documents
-		} else {
-			error.value = data.error || 'Failed to fetch documents'
-		}
-	} catch (e) {
-		error.value = 'Failed to fetch documents'
-	}
-}
+const { documents, error, fetchDocuments } = useDocuments()
 
 onMounted(() => {
 	fetchDocuments()

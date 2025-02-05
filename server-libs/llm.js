@@ -1,31 +1,23 @@
+import { Ollama } from 'ollama'
+import { config } from './config.js'
+
 export class OllamaService {
-	constructor(model = 'llama3.2') {
-		this.model = model
-		this.baseUrl = 'http://localhost:11434'
+	constructor() {
+		this.model = config.ollama.chatModel
+		this.ollama = new Ollama({ baseUrl: config.ollama.baseUrl })
 	}
 
 	async generateResponse(query, context) {
 		try {
 			const prompt = this.buildPrompt(query, context)
 			console.log('prompt:', prompt)
-			const response = await fetch(`${this.baseUrl}/api/generate`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					model: this.model,
-					prompt,
-					stream: false
-				})
+
+			const response = await this.ollama.generate({
+				model: this.model,
+				prompt
 			})
 
-			if (!response.ok) {
-				throw new Error(`Ollama API error: ${response.statusText}`)
-			}
-
-			const data = await response.json()
-			return data.response
+			return response.response
 		} catch (error) {
 			console.error('LLM generation error:', error)
 			throw new Error('Failed to generate response')
@@ -39,7 +31,13 @@ export class OllamaService {
 ${contextText}
 ---------------------
 Given the context information answer the following question: ${query}.
-But don't just answer the question. Provide a explanation or reasoning behind your answer. But keep it short and consise in max 3 paragraphs. Don't tell that you recieved any context.
+Don't tell that you recieved any context. 
+Don't tell based on the given context.
+Don't say "Based on my general knowledge, I can provide an answer."
+But don't just answer the question. 
+Not just anwswer the question, but provide a explanation. 
+Keep it short and consise in max 3 paragraphs. 
+
 If the context doesn't contain relevant information to answer the question, say "I don't have enough information to answer that question."`
 	}
 }

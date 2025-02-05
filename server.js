@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 import { OllamaEmbeddingFunction } from './server-libs/embedding.js'
 import { CollectionManager } from './server-libs/collection.js'
 import { registerRoutes } from './server-libs/routes.js'
+import config from './server-libs/config.js'
 
 const fastify = Fastify({ logger: true })
 
@@ -25,7 +26,7 @@ const start = async () => {
 			port: 3000,
 			host: 'localhost' // Changed from 0.0.0.0 to localhost
 		})
-		console.log('Server running at http://localhost:3000')
+		console.log(`Server listening at http://localhost:${config.server.port}`)
 	} catch (err) {
 		fastify.log.error(err)
 		process.exit(1)

@@ -101,4 +101,20 @@ export async function registerRoutes(fastify, collectionManager) {
 			return { success: false, error: error.message }
 		}
 	})
+
+	fastify.post('/clear', async (request, reply) => {
+		try {
+			const { confirmed } = request.body
+			if (!confirmed) {
+				reply.status(400)
+				return { success: false, error: 'Confirmation required' }
+			}
+
+			await collectionManager.clearCollection()
+			return { success: true, message: 'Collection cleared successfully' }
+		} catch (error) {
+			reply.status(500)
+			return { success: false, error: error.message }
+		}
+	})
 }

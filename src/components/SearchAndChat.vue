@@ -11,21 +11,24 @@
 								<input
 									type="text"
 									v-model="query"
-									@keyup.enter="searchDocuments"
+									@keyup.enter="handleSearch"
 									class="peer w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600"
 									placeholder="Enter your search query"
+									:disabled="isLoading"
 								/>
 							</div>
 							<div class="flex space-x-2">
 								<button
-									@click="searchDocuments"
+									@click="handleSearch"
 									class="mt-8 w-1/2 bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700"
+									:disabled="isLoading"
 								>
 									Search
 								</button>
 								<button
-									@click="chatWithDocuments"
+									@click="handleChat"
 									class="mt-8 w-1/2 bg-green-600 text-white rounded-lg px-4 py-2 hover:bg-green-700"
+									:disabled="isLoading"
 								>
 									Chat
 								</button>
@@ -61,64 +64,40 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useDocuments } from '../composables/useDocuments'
 
 const query = ref('')
 const results = ref([])
-const error = ref('')
 const chatResponse = ref('')
 const context = ref([])
+const { searchDocuments, chatWithDocuments, error, isLoading } = useDocuments()
 
-async function searchDocuments() {
+async function handleSearch() {
+	if (!query.value || isLoading.value) return
+
+	results.value = []
+	chatResponse.value = ''
+	context.value = []
+
 	try {
-		error.value = ''
-		results.value = []
-		chatResponse.value = ''
-		context.value = []
-
-		const response = await fetch('/api/search', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ query: query.value })
-		})
-
-		if (!response.ok) {
-			throw new Error('Search request failed')
-		}
-
-		const data = await response.json()
-		results.value = data.results
+		results.value = await searchDocuments(query.value)
 	} catch (e) {
-		error.value = e.message
 		console.error('Search error:', e)
 	}
 }
 
-async function chatWithDocuments() {
+async function handleChat() {
+	if (!query.value || isLoading.value) return
+
+	results.value = []
+	chatResponse.value = ''
+	context.value = []
+
 	try {
-		error.value = ''
-		results.value = []
-		chatResponse.value = ''
-		context.value = []
-
-		const response = await fetch('/api/chat', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ query: query.value })
-		})
-
-		if (!response.ok) {
-			throw new Error('Chat request failed')
-		}
-
-		const data = await response.json()
-		chatResponse.value = data.response
-		context.value = data.context
+		const response = await chatWithDocuments(query.value)
+		chatResponse.value = response.response
+		context.value = response.context
 	} catch (e) {
-		error.value = e.message
 		console.error('Chat error:', e)
 	}
 }

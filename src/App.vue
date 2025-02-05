@@ -19,6 +19,22 @@
 					>
 						Documents
 					</RouterLink>
+					<RouterLink
+						to="/add-document"
+						class="px-3 py-2 rounded-md text-sm font-medium"
+						active-class="bg-blue-600 text-white"
+						inactive-class="text-gray-700 hover:bg-gray-50"
+					>
+						Add Document
+					</RouterLink>
+					<RouterLink
+						to="/clear"
+						class="px-3 py-2 rounded-md text-sm font-medium"
+						active-class="bg-red-600 text-white"
+						inactive-class="text-gray-700 hover:bg-gray-50"
+					>
+						Clear Collection
+					</RouterLink>
 				</div>
 			</div>
 		</nav>
