@@ -1,137 +1,67 @@
 # ChromaDB Client
 
-A Vue.js-based web client for managing and interacting with ChromaDB vector database.
+A full-stack application for managing and interacting with ChromaDB vector database.
 
-## Prerequisites
+## Required Tools
 
-Before you begin, ensure you have the following installed:
+-   Node.js 18+
+-   Docker
+-   PNPM (`npm install -g pnpm`)
+-   Ollama ([Download](https://ollama.ai))
+-   ChromaDB (via Docker)
 
--   [Docker](https://www.docker.com/get-started) (for running ChromaDB)
--   [Ollama](https://ollama.ai/) (for local LLM support)
--   Node.js 18+ (LTS recommended)
--   Package manager: npm (comes with Node.js) or [pnpm](https://pnpm.io/installation) (recommended)
+## Quick Start
 
-## Setup
+1. **Start Required Services**
 
-1. **Install pnpm** (optional but recommended)
+```bash
+# Start ChromaDB
+docker run -d -p 8000:8000 chromadb/chroma
 
-    ```bash
-    npm install -g pnpm
-    ```
+# Download Ollama Models (after installing Ollama)
+ollama pull llama3.2
+```
 
-2. **Start ChromaDB**
+2. **Install Dependencies**
 
-    Run ChromaDB using Docker:
+```bash
+pnpm install
+```
 
-    ```bash
-    docker run -p 8000:8000 chromadb/chroma
-    ```
+3. **Configure Environment**
 
-3. **Start Ollama**
+```bash
+# Copy example env files
+cp apps/backend/example.env apps/backend/.env
+cp apps/frontend/example.env apps/frontend/.env
+```
 
-    First, ensure you have downloaded a model:
+4. **Run the Application**
 
-    ```bash
-    ollama pull llama3.2
-    ```
+Development mode:
 
-    Ollama will run automatically in the background after installation.
+```bash
+# Start both frontend and backend
+pnpm frontend:dev
+pnpm backend:dev
+```
 
-4. **Install Dependencies**
+Using Docker:
 
-    Using pnpm (recommended):
+```bash
+# Build and start all services
+pnpm docker:dev
 
-    ```bash
-    pnpm install
-    ```
+# Stop all services
+docker compose down
+```
 
-    Or using npm:
+Visit `http://localhost:5173` to access the application.
 
-    ```bash
-    npm install
-    ```
+## Tech Stack
 
-5. **Configure Environment**
-
-    Copy the example environment file to create your own:
-
-    ```bash
-    cp example.env .env
-    ```
-
-    Configure the following variables in `.env`:
-
-    ```env
-    # Ollama Configuration
-    OLLAMA_BASE_URL=http://localhost:11434
-    OLLAMA_CHAT_MODEL=llama3.2       # Or your preferred model
-    OLLAMA_EMBEDDING_MODEL=nomic-embed-text
-
-    # ChromaDB Configuration
-    CHROMA_COLLECTION_NAME=your-collection-name
-    CHROMA_SERVER_URL=http://localhost:8000
-
-    # Server Configuration
-    SERVER_PORT=3000
-    SERVER_HOST=localhost
-    ```
-
-6. **Start the Application**
-
-    Using pnpm:
-
-    ```bash
-    pnpm dev
-    ```
-
-    Or using npm:
-
-    ```bash
-    npm run dev
-    ```
-
-    The application will be available at `http://localhost:5173`
-
-## Features
-
--   Add documents in ChromaDB collections
--   Perform semantic searches across your documents
--   Clear collections when needed
--   Real-time interaction with local LLMs through Ollama
-
-## Usage
-
-1. **Adding Documents**
-
-    - Navigate to the home page
-    - Upload text documents or paste text directly
-    - Documents will be processed and stored in ChromaDB
-
-2. **Searching**
-
-    - Use the search page to perform semantic searches
-    - Enter your query in natural language
-    - View matching results with relevance scores
-
-3. **Managing Collections**
-    - View all collections in the collections page
-    - Clear collections when needed (warning: this action is irreversible)
-
-## Development
-
-To contribute to this project:
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
-
-## Architecture
-
--   Frontend: Vue.js with TypeScript
--   Vector Database: ChromaDB
--   LLM Integration: Ollama with LLama3.2
--   Styling: Tailwind CSS
-
-## License
-
-MIT License
+-   Frontend: Vue.js + Tailwind CSS
+-   Backend: Node.js/Express
+-   Database: ChromaDB
+-   LLM: Ollama (llama2)
+-   Containerization: Docker
