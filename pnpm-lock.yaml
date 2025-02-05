@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.0.0
+        version: 5.2.1(vite@5.4.14(@types/node@22.13.1)(lightningcss@1.29.1))(vue@3.5.13)
       chromadb:
         specifier: ^1.10.4
         version: 1.10.4
@@ -32,6 +35,12 @@ importers:
       strip-markdown:
         specifier: ^6.0.0
         version: 6.0.0
+      tailwindcss:
+        specifier: ^4.0.0
+        version: 4.0.0
+      vite:
+        specifier: ^5.0.0
+        version: 5.4.14(@types/node@22.13.1)(lightningcss@1.29.1)
       vue:
         specifier: ^3.5.13
         version: 3.5.13
@@ -39,30 +48,18 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0(vue@3.5.13)
     devDependencies:
-      '@fastify/cors':
-        specifier: ^10.0.2
-        version: 10.0.2
       '@tailwindcss/postcss':
         specifier: ^4.0.3
         version: 4.0.3
       '@tailwindcss/vite':
         specifier: ^4.0.3
         version: 4.0.3(vite@5.4.14(@types/node@22.13.1)(lightningcss@1.29.1))
-      '@vitejs/plugin-vue':
-        specifier: ^5.0.0
-        version: 5.2.1(vite@5.4.14(@types/node@22.13.1)(lightningcss@1.29.1))(vue@3.5.13)
       autoprefixer:
         specifier: ^10.4.16
         version: 10.4.20(postcss@8.5.1)
       postcss:
         specifier: ^8.5.1
         version: 8.5.1
-      tailwindcss:
-        specifier: ^4.0.0
-        version: 4.0.0
-      vite:
-        specifier: ^5.0.0
-        version: 5.4.14(@types/node@22.13.1)(lightningcss@1.29.1)
 
 packages:
 
@@ -227,9 +224,6 @@ packages:
 
   '@fastify/ajv-compiler@4.0.2':
     resolution: {integrity: sha512-Rkiu/8wIjpsf46Rr+Fitd3HRP+VsxUFDDeag0hs9L0ksfnwx2g7SPQQTFL0E8Qv+rfXzQOxBJnjUB9ITUDjfWQ==}
-
-  '@fastify/cors@10.0.2':
-    resolution: {integrity: sha512-DGdxOG36sS/tZv1NFiCJGi7wGuXOSPL2CmNX5PbOVKx0C6LuIALRMrqLByHTCcX1Rbl8NJ9IWlJex32bzydvlw==}
 
   '@fastify/error@4.0.0':
     resolution: {integrity: sha512-OO/SA8As24JtT1usTUTKgGH7uLvhfwZPwlptRi2Dp5P4KKmJI3gvsZ8MIHnNwDs4sLf/aai5LzTyl66xr7qMxA==}
@@ -765,9 +759,6 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
-  fastify-plugin@5.0.1:
-    resolution: {integrity: sha512-HCxs+YnRaWzCl+cWRYFnHmeRFyR5GVnJTAaCJQiYzQSDwK9MgJdyAsuL3nh0EWRCYMgQ5MeziymvmAhUHYHDUQ==}
-
   fastify@5.2.1:
     resolution: {integrity: sha512-rslrNBF67eg8/Gyn7P2URV8/6pz8kSAscFL4EThZJ8JBMaXacVdVE4hmUcnPNKERl5o/xTiBSLfdowBRhVF1WA==}
 
@@ -1015,9 +1006,6 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
-  mnemonist@0.39.8:
-    resolution: {integrity: sha512-vyWo2K3fjrUw8YeeZ1zF0fy6Mu59RHokURlld8ymdUPjMlD9EC9ov1/YPqTgqRvUN9nTr3Gqfz29LYAmu0PHPQ==}
-
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
@@ -1051,9 +1039,6 @@ packages:
   normalize-range@0.1.2:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
-
-  obliterator@2.0.5:
-    resolution: {integrity: sha512-42CPE9AhahZRsMNslczq0ctAEtqk8Eka26QofnqC346BZdHDySk3LWka23LI7ULIw11NmltpiLagIq8gBozxTw==}
 
   ollama@0.5.12:
     resolution: {integrity: sha512-flVH1fn1c9NF7VV3bW9kSu0E+bYc40b4DxL/gS2Debhao35osJFRDiPOj9sIWTMvcyj78Paw1OuhfIe7uhDWfQ==}
@@ -1466,11 +1451,6 @@ snapshots:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       fast-uri: 3.0.6
-
-  '@fastify/cors@10.0.2':
-    dependencies:
-      fastify-plugin: 5.0.1
-      mnemonist: 0.39.8
 
   '@fastify/error@4.0.0': {}
 
@@ -1968,8 +1948,6 @@ snapshots:
 
   fast-uri@3.0.6: {}
 
-  fastify-plugin@5.0.1: {}
-
   fastify@5.2.1:
     dependencies:
       '@fastify/ajv-compiler': 4.0.2
@@ -2294,10 +2272,6 @@ snapshots:
 
   mkdirp-classic@0.5.3: {}
 
-  mnemonist@0.39.8:
-    dependencies:
-      obliterator: 2.0.5
-
   ms@2.1.3: {}
 
   nanoid@3.3.8: {}
@@ -2317,8 +2291,6 @@ snapshots:
   node-releases@2.0.19: {}
 
   normalize-range@0.1.2: {}
-
-  obliterator@2.0.5: {}
 
   ollama@0.5.12:
     dependencies:

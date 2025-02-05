@@ -18,17 +18,15 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-		"backend": "node ./server.js --watch"
+		"preview": "vite preview",
+		"backend": "node ./server.js --watch",
+		"docker:dev": "pnpm build && docker compose -f dev-compose.yml up --build"
 	},
 	"devDependencies": {
-		"@fastify/cors": "^10.0.2",
 		"@tailwindcss/postcss": "^4.0.3",
 		"@tailwindcss/vite": "^4.0.3",
-		"@vitejs/plugin-vue": "^5.0.0",
 		"autoprefixer": "^10.4.16",
-		"postcss": "^8.5.1",
-		"tailwindcss": "^4.0.0",
-		"vite": "^5.0.0"
+		"postcss": "^8.5.1"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.1",
@@ -40,6 +38,9 @@
 		"remark": "^15.0.1",
 		"strip-markdown": "^6.0.0",
 		"vue": "^3.5.13",
-		"vue-router": "^4.5.0"
+		"vue-router": "^4.5.0",
+		"vite": "^5.0.0",
+		"@vitejs/plugin-vue": "^5.0.0",
+		"tailwindcss": "^4.0.0"
 	}
 }

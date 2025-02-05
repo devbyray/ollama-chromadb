@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  chromadb:
+    image: chromadb/chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      # Use host.docker.internal for Docker Desktop (Windows/Mac)
+      # Use http://172.17.0.1:11434 for Linux hosts
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_CHAT_MODEL=llama3.2
+      - OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+      - CHROMA_COLLECTION_NAME=your-collection-name
+      - CHROMA_SERVER_URL=http://chromadb:8000
+      - SERVER_PORT=3000
+      - SERVER_HOST=0.0.0.0
+    depends_on:
+      - chromadb
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+
+volumes:
+  chroma-data:
