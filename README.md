@@ -1,5 +1,7 @@
 # ChromaDB Client
 
+⚠️ This project is WIP (Work In Progress 😉)
+
 A full-stack application for managing and interacting with ChromaDB vector database.
 
 ## Required Tools
