@@ -94,7 +94,7 @@ Before you begin, ensure you have the following installed:
 
 ## Features
 
--   Upload and manage documents in ChromaDB collections
+-   Add documents in ChromaDB collections
 -   Perform semantic searches across your documents
 -   Clear collections when needed
 -   Real-time interaction with local LLMs through Ollama
@@ -129,7 +129,7 @@ To contribute to this project:
 
 -   Frontend: Vue.js with TypeScript
 -   Vector Database: ChromaDB
--   LLM Integration: Ollama with Mistral
+-   LLM Integration: Ollama with LLama3.2
 -   Styling: Tailwind CSS
 
 ## License
