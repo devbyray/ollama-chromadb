@@ -63,5 +63,5 @@ Visit `http://localhost:5173` to access the application.
 -   Frontend: Vue.js + Tailwind CSS
 -   Backend: Node.js/Express
 -   Database: ChromaDB
--   LLM: Ollama (llama2)
+-   LLM: Ollama (llama3.2)
 -   Containerization: Docker
