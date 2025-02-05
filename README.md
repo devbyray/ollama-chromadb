@@ -32,7 +32,7 @@ Before you begin, ensure you have the following installed:
     First, ensure you have downloaded a model:
 
     ```bash
-    ollama pull mistral
+    ollama pull llama3.2
     ```
 
     Ollama will run automatically in the background after installation.
