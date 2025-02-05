@@ -35,8 +35,30 @@ export class OllamaEmbeddingFunction {
 		}
 	}
 
+	sanitizeText(text) {
+		if (typeof text !== 'string') {
+			text = String(text)
+		}
+		// Remove null characters and other problematic characters
+		text = text
+			.replace(/\0/g, '')
+			.replace(/^\s+|\s+$/g, '') // trim whitespace
+			.replace(/[\r\n]+/g, ' ') // replace newlines with spaces
+
+		// Ensure text isn't empty and has reasonable length
+		if (!text) {
+			text = ' ' // provide minimal valid input
+		}
+		// Limit text length if needed (adjust limit as needed)
+		const maxLength = 8192
+		if (text.length > maxLength) {
+			text = text.substring(0, maxLength)
+		}
+		return text
+	}
+
 	async generate(texts) {
-		const modelCandidates = ['nomic-embed-text:latest', 'llama3.2:latest', 'llama3.1:latest']
+		const modelCandidates = ['nomic-embed-text:latest', 'llama3.2:latest']
 		let selectedModel = null
 		let availableModels = []
 
@@ -59,26 +81,32 @@ export class OllamaEmbeddingFunction {
 			const embeddings = await Promise.all(
 				texts.map(async text => {
 					try {
+						const sanitizedText = this.sanitizeText(text)
 						const response = await fetch('http://localhost:11434/api/embeddings', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
 								model: selectedModel,
-								prompt: text
+								prompt: sanitizedText,
+								options: {
+									temperature: 0
+								}
 							})
 						})
 
 						if (!response.ok) {
-							throw new Error(`Failed to generate embedding: ${response.statusText}`)
+							const errorData = await response.text()
+							throw new Error(`Embedding request failed (${response.status}): ${errorData}`)
 						}
 
 						const data = await response.json()
 						if (!data.embedding || !Array.isArray(data.embedding)) {
+							console.error('Invalid embedding response:', data)
 							throw new Error('Invalid embedding response from Ollama')
 						}
 						return data.embedding
 					} catch (error) {
-						console.error('Error generating embedding:', error)
+						console.error('Error generating individual embedding:', error)
 						throw error
 					}
 				})

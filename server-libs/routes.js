@@ -36,7 +36,10 @@ export async function registerRoutes(fastify, collectionManager) {
 				return { success: false, error: 'Documents array is required' }
 			}
 
-			const count = await collectionManager.addDocuments(documents)
+			// Convert documents to strings if they are objects
+			const processedDocs = documents.map(doc => (typeof doc === 'object' ? JSON.stringify(doc) : String(doc)))
+
+			const count = await collectionManager.addDocuments(processedDocs)
 			return { success: true, message: 'Documents added successfully', count }
 		} catch (error) {
 			reply.status(500)
@@ -52,7 +55,10 @@ export async function registerRoutes(fastify, collectionManager) {
 				return { success: false, error: 'Content is required' }
 			}
 
-			const count = await collectionManager.addDocuments([{ content }])
+			// Convert content to string if it's an object
+			const processedContent = typeof content === 'object' ? JSON.stringify(content) : String(content)
+
+			const count = await collectionManager.addDocuments([processedContent])
 			return { success: true, message: 'Document added successfully', count }
 		} catch (error) {
 			reply.status(500)
